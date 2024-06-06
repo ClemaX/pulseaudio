@@ -238,7 +238,10 @@ static void reply_info_free(struct reply_info *r) {
     if (r->time_event)
         r->pdispatch->mainloop->time_free(r->time_event);
 
-    PA_LLIST_REMOVE(struct reply_info, r->pdispatch->replies, r);
+    if (r != r->pdispatch->replies)
+        PA_LLIST_REMOVE(struct reply_info, r->pdispatch->replies, r);
+    else
+        r->pdispatch->replies = r->next;
 
     if (pa_flist_push(PA_STATIC_FLIST_GET(reply_infos), r) < 0)
         pa_xfree(r);
